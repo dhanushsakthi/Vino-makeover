@@ -792,7 +792,6 @@ async function uploadToCloudinary(fileOrDataUrl, folder = 'vino_makeover') {
 const ADMIN_STATIC_IMAGES = {
   'bridal-look': [
     { src: 'Bridal look.jpg', caption: 'Bridal Look' },
-    { src: '01_bridal_makeover_background.png', caption: 'Bridal Makeover Artwork' },
     { src: 'bridal set1.jpg', caption: 'Bridal Set 1' },
     { src: 'bridal set2.jpg', caption: 'Bridal Set 2' },
     { src: 'bridal set3.jpg', caption: 'Bridal Set 3' },
@@ -805,8 +804,7 @@ const ADMIN_STATIC_IMAGES = {
     { src: 'bridal set4.jpg', caption: 'Bridal Set 4' },
     { src: 'bridal set5.jpg', caption: 'Bridal Set 5' },
     { src: 'bridal set6.jpg', caption: 'Bridal Set 6' },
-    { src: 'bridal set7.jpg', caption: 'Bridal Set 7' },
-    { src: '01_bridal_jewellery_background.png', caption: 'Bridal Jewellery & Makeup' }
+    { src: 'bridal set7.jpg', caption: 'Bridal Set 7' }
   ],
   'engagement-look': [
     { src: 'engagementlook.jpg', caption: 'Engagement Look' }
@@ -818,20 +816,16 @@ const ADMIN_STATIC_IMAGES = {
     { src: 'Flowers Garland4.jpg', caption: 'Jasmine Garland' },
     { src: 'Flowers Garland5.jpg', caption: 'Ceremony Garland' },
     { src: 'Flowers Garland6.jpg', caption: 'Floral Crown' },
-    { src: 'Flowers Garland7.jpg', caption: 'Rose Garland' },
-    { src: '03_fresh_flower_garlands_background.png', caption: 'Handcrafted Garland Collection' }
+    { src: 'Flowers Garland7.jpg', caption: 'Rose Garland' }
   ],
   'haldi-set': [
-    { src: 'Heldi set.jpg', caption: 'Bridal Mehandi & Haldi' },
-    { src: '05_mehandi_henna_background.png', caption: 'Vibrant Haldi Styling' }
+    { src: 'Heldi set.jpg', caption: 'Bridal Mehandi & Haldi' }
   ],
   'messy-hairstyle': [
-    { src: 'messy hairstyle.jpg', caption: 'Messy Hairstyle' },
-    { src: '04_bridal_hair_background.png', caption: 'Chic Messy Hair Styling' }
+    { src: 'messy hairstyle.jpg', caption: 'Messy Hairstyle' }
   ],
   'mukurtham-hairdo': [
     { src: 'Mukurtham Harido1.jpg', caption: 'Mukurtham Hairdo 1' },
-    { src: '02_mukurtham_hairdo_background.png', caption: 'Traditional Mukurtham Hair' },
     { src: 'Mukurtham Harido2.jpg', caption: 'Mukurtham Hairdo 2' },
     { src: 'Mukurtham Harido3.jpg', caption: 'Mukurtham Hairdo 3' },
     { src: 'Mukurtham Harido4.jpg', caption: 'Mukurtham Hairdo 4' },
@@ -846,22 +840,31 @@ const ADMIN_STATIC_IMAGES = {
     { src: 'pubertylook.jpg', caption: 'Puberty Ceremony Look' }
   ],
   'blouse-aari': [
-    { src: 'Blouse-Thumbnail-image.png', caption: 'Custom Aari Embroidery Blouse' },
-    { src: '06_blouse_aari_background.png', caption: 'Hand Worked Aari Blouse Stitch' }
+    { src: 'Blouse-Thumbnail-image.png', caption: 'Custom Aari Embroidery Blouse' }
   ],
   'certificates': [
-    { src: 'certificate-thumb.jpg', caption: 'Government NSDC Certification' },
     { src: 'certificate.webp', caption: 'Government NSDC Certified Beauty Artist' },
-    { src: 'certificate-background.png', caption: 'Certified Beauty & Bridal Professional' },
     { src: 'certificate-collect image.jpg', caption: 'Official Certificate Honor' }
   ]
 };
+
+let adminGalleryFilterCat = 'all';
+let adminGallerySearchQuery = '';
 
 async function refreshGalleryGrid() {
   if (typeof VMDB === 'undefined') return;
 
   const grid = document.getElementById('admin-manage-grid');
   if (!grid) return;
+
+  // Populate category filter select if available
+  const catFilterSelect = document.getElementById('admin-manage-cat-filter');
+  if (catFilterSelect && catFilterSelect.options.length <= 1) {
+    const currentVal = catFilterSelect.value || 'all';
+    catFilterSelect.innerHTML = `<option value="all">All Categories</option>` +
+      allCategories.map(c => `<option value="${c.slug}">${c.name}</option>`).join('');
+    catFilterSelect.value = currentVal;
+  }
 
   const deletedStatics = (await VMDB.dbGetSetting('deleted_static_images')) || [];
   const editedStatics = (await VMDB.dbGetSetting('edited_static_images')) || {};
@@ -901,26 +904,54 @@ async function refreshGalleryGrid() {
     console.warn('DB images load info:', e);
   }
 
-  if (!allGalleryImages.length) {
-    grid.innerHTML = `<p style="color:var(--admin-text-muted);">No gallery images found.</p>`;
+  renderFilteredAdminGalleryGrid();
+}
+
+function filterAdminGalleryGrid(slug) {
+  adminGalleryFilterCat = slug;
+  renderFilteredAdminGalleryGrid();
+}
+
+function searchAdminGalleryGrid(query) {
+  adminGallerySearchQuery = (query || '').toLowerCase().trim();
+  renderFilteredAdminGalleryGrid();
+}
+
+function renderFilteredAdminGalleryGrid() {
+  const grid = document.getElementById('admin-manage-grid');
+  if (!grid) return;
+
+  let filtered = allGalleryImages;
+  if (adminGalleryFilterCat !== 'all') {
+    filtered = filtered.filter(img => img.categorySlug === adminGalleryFilterCat);
+  }
+  if (adminGallerySearchQuery) {
+    filtered = filtered.filter(img => (img.caption || '').toLowerCase().includes(adminGallerySearchQuery));
+  }
+
+  if (!filtered.length) {
+    grid.innerHTML = `<p style="color:var(--admin-text-muted);grid-column:1/-1;padding:24px;text-align:center;">No gallery images found matching filter criteria.</p>`;
     return;
   }
 
-  grid.innerHTML = allGalleryImages.map((img, idx) => `
-    <div style="background:var(--admin-card);border:1px solid var(--admin-border);border-radius:var(--radius-md);overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;">
-      <div>
-        <img src="${img.src}" style="width:100%;height:160px;object-fit:cover;" />
-        <div style="padding:14px;">
-          <div style="font-size:0.88rem;font-weight:600;margin-bottom:4px;word-break:break-word;">${img.caption || 'Untitled Image'}</div>
-          <div style="font-size:0.75rem;color:var(--brand-gold);margin-bottom:8px;">${img.categorySlug} ${img.isStatic ? '<span style="opacity:0.6;">(Default)</span>' : ''}</div>
+  grid.innerHTML = filtered.map((img) => {
+    const realIdx = allGalleryImages.findIndex(i => i.id === img.id);
+    return `
+      <div style="background:var(--admin-card);border:1px solid var(--admin-border);border-radius:var(--radius-md);overflow:hidden;display:flex;flex-direction:column;justify-space-between;">
+        <div>
+          <img src="${img.src}" style="width:100%;height:160px;object-fit:cover;" />
+          <div style="padding:14px;">
+            <div style="font-size:0.88rem;font-weight:600;margin-bottom:4px;word-break:break-word;">${img.caption || 'Untitled Image'}</div>
+            <div style="font-size:0.75rem;color:var(--brand-gold);margin-bottom:8px;">${img.categorySlug} ${img.isStatic ? '<span style="opacity:0.6;">(Default)</span>' : ''}</div>
+          </div>
+        </div>
+        <div style="padding:0 14px 14px 14px;display:flex;gap:8px;">
+          <button class="btn-action" style="background:rgba(212,175,55,0.15);color:var(--brand-gold);flex:1;justify-content:center;" onclick="openEditImageModal(${realIdx})">✏️ Edit</button>
+          <button class="btn-action" style="background:rgba(230,57,70,0.15);color:var(--danger);flex:1;justify-content:center;" onclick="deleteGalleryImage('${img.id}')">🗑 Delete</button>
         </div>
       </div>
-      <div style="padding:0 14px 14px 14px;display:flex;gap:8px;">
-        <button class="btn-action" style="background:rgba(212,175,55,0.15);color:var(--brand-gold);flex:1;justify-content:center;" onclick="openEditImageModal(${idx})">✏️ Edit</button>
-        <button class="btn-action" style="background:rgba(230,57,70,0.15);color:var(--danger);flex:1;justify-content:center;" onclick="deleteGalleryImage('${img.id}')">🗑 Delete</button>
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 let stagedEditImageData = null;

@@ -65,13 +65,10 @@ const STATIC_CATEGORY_IMAGES = {
     { src: 'pubertylook.jpg', caption: 'Puberty Ceremony Look' }
   ],
   'blouse-aari': [
-    { src: 'Blouse-Thumbnail-image.png', caption: 'Custom Aari Embroidery Blouse' },
-    { src: '06_blouse_aari_background.png', caption: 'Hand Worked Aari Blouse Stitch' }
+    { src: 'Blouse-Thumbnail-image.png', caption: 'Custom Aari Embroidery Blouse' }
   ],
   'certificates': [
-    { src: 'certificate-thumb.jpg', caption: 'Government NSDC Certification' },
     { src: 'certificate.webp', caption: 'Government NSDC Certified Beauty Artist' },
-    { src: 'certificate-background.png', caption: 'Certified Beauty & Bridal Professional' },
     { src: 'certificate-collect image.jpg', caption: 'Official Certificate Honor' }
   ]
 };

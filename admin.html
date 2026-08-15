@@ -198,8 +198,18 @@
 
         <!-- ======== MANAGE GALLERY PANEL ======== -->
         <div class="admin-panel" id="panel-manage">
-          <h2 style="font-family:var(--font-serif);font-size:1.8rem;margin-bottom:8px;">Manage Gallery 🖼️</h2>
-          <p style="color:var(--admin-text-muted);margin-bottom:24px;">View and manage all uploaded gallery images.</p>
+          <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:20px;gap:16px;">
+            <div>
+              <h2 style="font-family:var(--font-serif);font-size:1.8rem;margin-bottom:4px;">Manage Gallery 🖼️</h2>
+              <p style="color:var(--admin-text-muted);">View, edit, re-categorize, and delete portfolio images.</p>
+            </div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+              <select class="form-control" id="admin-manage-cat-filter" onchange="filterAdminGalleryGrid(this.value)" style="width:auto;min-width:180px;">
+                <option value="all">All Categories</option>
+              </select>
+              <input class="form-control" type="text" id="admin-manage-search" placeholder="🔍 Search images..." oninput="searchAdminGalleryGrid(this.value)" style="width:auto;min-width:180px;" />
+            </div>
+          </div>
 
           <div class="settings-grid" id="admin-manage-grid"></div>
         </div>
