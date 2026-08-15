@@ -63,6 +63,16 @@ const STATIC_CATEGORY_IMAGES = {
   ],
   'puberty-look': [
     { src: 'pubertylook.jpg', caption: 'Puberty Ceremony Look' }
+  ],
+  'blouse-aari': [
+    { src: 'Blouse-Thumbnail-image.png', caption: 'Custom Aari Embroidery Blouse' },
+    { src: '06_blouse_aari_background.png', caption: 'Hand Worked Aari Blouse Stitch' }
+  ],
+  'certificates': [
+    { src: 'certificate-thumb.jpg', caption: 'Government NSDC Certification' },
+    { src: 'certificate.webp', caption: 'Government NSDC Certified Beauty Artist' },
+    { src: 'certificate-background.png', caption: 'Certified Beauty & Bridal Professional' },
+    { src: 'certificate-collect image.jpg', caption: 'Official Certificate Honor' }
   ]
 };
 
@@ -355,13 +365,13 @@ async function renderDynamicServices() {
   if (!container) return;
   const services = await VMDB.dbGetAllServices();
   if (!services || !services.length) return;
-  const commonBg = await VMDB.dbGetSetting('bg_image_services');
+  const commonBg = (await VMDB.dbGetSetting('bg_image_services')) || 'common-background-image.png';
 
   container.innerHTML = services.map(s => {
     const cardBg = s.bgImage || commonBg;
     const hasBg = !!cardBg;
     const bgStyle = hasBg 
-      ? `style="background-image: linear-gradient(rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.68)), url('${cardBg}'); background-size: cover; background-position: center;"`
+      ? `style="background-image: linear-gradient(rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.78)), url('${encodeURI(cardBg)}'); background-size: cover; background-position: center;"`
       : '';
     return `
       <div class="why-card ${hasBg ? 'has-custom-bg' : ''}" ${bgStyle}>
@@ -379,13 +389,13 @@ async function renderDynamicWhyUs() {
   if (!container) return;
   const features = (await VMDB.dbGetSetting('why_us_features')) || [];
   if (!features || !features.length) return;
-  const commonBg = await VMDB.dbGetSetting('bg_image_whyus');
+  const commonBg = (await VMDB.dbGetSetting('bg_image_whyus')) || 'Personalized Artistr-background image.png';
 
   container.innerHTML = features.map(f => {
     const cardBg = f.bgImage || commonBg;
     const hasBg = !!cardBg;
     const bgStyle = hasBg 
-      ? `style="background-image: linear-gradient(rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.68)), url('${cardBg}'); background-size: cover; background-position: center;"`
+      ? `style="background-image: linear-gradient(rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.78)), url('${encodeURI(cardBg)}'); background-size: cover; background-position: center;"`
       : '';
     return `
       <div class="why-card ${hasBg ? 'has-custom-bg' : ''}" ${bgStyle}>
@@ -403,13 +413,13 @@ async function renderDynamicTestimonials() {
   if (!container) return;
   const testimonials = await VMDB.dbGetAllTestimonials();
   if (!testimonials || !testimonials.length) return;
-  const commonBg = await VMDB.dbGetSetting('bg_image_testimonials');
+  const commonBg = (await VMDB.dbGetSetting('bg_image_testimonials')) || 'Comment-section-background.png';
 
   container.innerHTML = testimonials.map(t => {
     const cardBg = t.bgImage || commonBg;
     const hasBg = !!cardBg;
     const bgStyle = hasBg 
-      ? `style="background-image: linear-gradient(rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.68)), url('${cardBg}'); background-size: cover; background-position: center;"`
+      ? `style="background-image: linear-gradient(rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.78)), url('${encodeURI(cardBg)}'); background-size: cover; background-position: center;"`
       : '';
     return `
       <div class="testi-card ${hasBg ? 'has-custom-bg' : ''}" ${bgStyle}>
@@ -427,17 +437,17 @@ async function renderDynamicTestimonials() {
 async function applySectionBgImages() {
   if (typeof VMDB === 'undefined') return;
   const sections = [
-    { key: 'services', id: 'services' },
-    { key: 'whyus', id: 'why-choose-us' },
-    { key: 'testimonials', id: 'testimonials' }
+    { key: 'services', id: 'services', defaultBg: 'common-background-image.png' },
+    { key: 'whyus', id: 'why-choose-us', defaultBg: 'Personalized Artistr-background image.png' },
+    { key: 'testimonials', id: 'testimonials', defaultBg: 'Comment-section-background.png' }
   ];
 
   for (const s of sections) {
-    const bgImg = await VMDB.dbGetSetting(`bg_image_${s.key}`);
+    const bgImg = (await VMDB.dbGetSetting(`bg_image_${s.key}`)) || s.defaultBg;
     const secEl = document.getElementById(s.id);
     if (secEl) {
       if (bgImg) {
-        secEl.style.backgroundImage = `linear-gradient(rgba(253, 251, 247, 0.88), rgba(253, 251, 247, 0.88)), url('${bgImg}')`;
+        secEl.style.backgroundImage = `linear-gradient(rgba(253, 251, 247, 0.88), rgba(253, 251, 247, 0.88)), url('${encodeURI(bgImg)}')`;
         secEl.style.backgroundSize = 'cover';
         secEl.style.backgroundPosition = 'center';
       } else {
