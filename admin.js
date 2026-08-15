@@ -17,9 +17,10 @@ let allCategories = [];
 let allGalleryImages = [];
 let editingCategoryId = null;
 
-/* ============================================================
-   INIT & AUTH CHECK
-   ============================================================ */
+function toggleSidebar() {
+  const sidebar = document.querySelector('.admin-sidebar');
+  if (sidebar) sidebar.classList.toggle('open');
+}
 document.addEventListener('DOMContentLoaded', async () => {
   initStoredCredentials();
 

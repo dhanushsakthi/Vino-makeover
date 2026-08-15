@@ -1401,3 +1401,338 @@ button {
   background: rgba(212, 175, 55, 0.25) !important;
   border-color: var(--color-accent) !important;
 }
+
+/* ============================================================
+   100% PERFECT RESPONSIVE MEDIA QUERIES (Smartphones & Tablets)
+   ============================================================ */
+
+/* ---------- TABLETS & SMALL LAPTOPS (max-width: 1024px) ---------- */
+@media (max-width: 1024px) {
+  .hero-title {
+    font-size: 3rem;
+  }
+  .section {
+    padding: 70px 0;
+  }
+  .circle-categories-strip {
+    gap: 20px;
+  }
+  .circle-cat-item {
+    width: 100px;
+  }
+  .circle-cat-img-wrap {
+    width: 90px;
+    height: 90px;
+  }
+}
+
+/* ---------- TABLETS & MEDIUM SCREENS (max-width: 900px) ---------- */
+@media (max-width: 900px) {
+  .header-top-bar {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+    padding: 10px 16px;
+  }
+  .header-actions {
+    justify-content: center;
+    width: 100%;
+    gap: 8px;
+  }
+  .header-nav-bar {
+    gap: 14px;
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+  .header-nav-link {
+    font-size: 0.78rem;
+    letter-spacing: 1px;
+  }
+  .hero {
+    min-height: 85vh;
+    padding-top: 60px;
+  }
+  .hero-title {
+    font-size: 2.4rem;
+  }
+  .hero-desc {
+    font-size: 0.98rem;
+    margin-bottom: 24px;
+  }
+  .hero-stats {
+    padding: 12px 20px;
+    gap: 16px;
+  }
+  .stat-num {
+    font-size: 1.25rem;
+  }
+  .stat-label {
+    font-size: 0.65rem;
+  }
+  .masonry-grid {
+    column-count: 2;
+    column-gap: 16px;
+  }
+  .why-grid, #services-cards-grid, #whyus-cards-grid, #testimonials-cards-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 16px !important;
+  }
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+}
+
+/* ---------- SMARTPHONES & MOBILE PHONES (max-width: 600px) ---------- */
+@media (max-width: 600px) {
+  /* Body & Container */
+  .container {
+    padding: 0 16px;
+  }
+  .section {
+    padding: 50px 0;
+  }
+  .section-title {
+    font-size: 2rem;
+  }
+  .section-desc {
+    font-size: 0.92rem;
+    margin-bottom: 30px;
+  }
+
+  /* Royal Header Mobile Layout */
+  .aaraa-header {
+    padding: 12px 0 8px 0;
+  }
+  .header-top-bar {
+    padding: 0 12px;
+  }
+  .header-logo-img {
+    height: 42px;
+  }
+  .brand-logo-title {
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+  }
+  .brand-logo-sub {
+    font-size: 0.65rem;
+    letter-spacing: 1.5px;
+  }
+  .collections-btn {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+  }
+  .header-action-icon {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+  .header-nav-bar {
+    gap: 8px 12px;
+    justify-content: center;
+  }
+  .header-nav-link {
+    font-size: 0.72rem;
+    letter-spacing: 0.5px;
+  }
+
+  /* Horizontally Swipeable Touch Category Strip on Mobile */
+  .circle-categories-section {
+    padding: 20px 0 16px 0;
+  }
+  .circle-categories-strip {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+    padding: 0 16px;
+    justify-content: flex-start;
+    scrollbar-width: none;
+  }
+  .circle-categories-strip::-webkit-scrollbar {
+    display: none;
+  }
+  .circle-cat-item {
+    flex: 0 0 auto;
+    width: 82px;
+    scroll-snap-align: start;
+    gap: 8px;
+  }
+  .circle-cat-img-wrap {
+    width: 72px;
+    height: 72px;
+  }
+  .circle-cat-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+  }
+
+  /* Fullscreen Hero Mobile Optimization */
+  .hero {
+    min-height: 80vh;
+    padding: 70px 0 40px 0;
+  }
+  .hero-tagline {
+    font-size: 0.72rem;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+  .hero-title {
+    font-size: 1.85rem;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .hero-desc {
+    font-size: 0.88rem;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .hero-btns {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+    margin-bottom: 30px;
+  }
+  .hero-btns .btn {
+    width: 100%;
+    max-width: 280px;
+    padding: 12px 20px;
+    font-size: 0.88rem;
+  }
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+    max-width: 320px;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    gap: 12px;
+  }
+  .stat-divider {
+    display: none;
+  }
+  .stat-num {
+    font-size: 1.2rem;
+  }
+  .stat-label {
+    font-size: 0.62rem;
+  }
+
+  /* Category Strip Grid (Our Work Section) */
+  .category-strip-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .category-thumb-title {
+    font-size: 1.2rem;
+  }
+  .category-thumb-overlay {
+    padding: 14px;
+  }
+
+  /* Gallery Filters & Masonry Portfolio Grid */
+  .gallery-filters {
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+  .gfilter {
+    padding: 8px 14px;
+    font-size: 0.75rem;
+  }
+  .masonry-grid {
+    column-count: 2;
+    column-gap: 10px;
+  }
+  .masonry-item, .gallery-card {
+    margin-bottom: 10px;
+    border-radius: var(--radius-sm);
+  }
+  .card-overlay span {
+    font-size: 0.95rem;
+  }
+
+  /* Dynamic Services, Why Choose Us, Testimonials Cards */
+  .why-grid, #services-cards-grid, #whyus-cards-grid, #testimonials-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .why-card, .testi-card {
+    padding: 20px !important;
+  }
+
+  /* Contact & Form Wrap */
+  .contact-info, .contact-form-wrap {
+    padding: 20px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Footer Mobile Layout */
+  .footer {
+    padding: 50px 0 24px 0;
+  }
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .footer-bottom {
+    margin-top: 30px;
+    padding-top: 16px;
+    font-size: 0.75rem;
+  }
+
+  /* Floating Social Action Buttons */
+  .floating-social {
+    bottom: 16px;
+    right: 14px;
+    gap: 8px;
+  }
+  .float-btn {
+    width: 44px;
+    height: 44px;
+  }
+  .float-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  #scroll-top {
+    bottom: 16px;
+    left: 14px;
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+  }
+
+  /* Modals Mobile Adaptation */
+  .modal-box, #vcard-modal {
+    width: 95% !important;
+    padding: 18px !important;
+    max-height: 90vh !important;
+  }
+  .vcard-tab-btn {
+    padding: 10px 16px;
+    font-size: 0.82rem;
+    min-width: 130px;
+  }
+}
+
+/* ---------- SMALL SMARTPHONES (max-width: 380px) ---------- */
+@media (max-width: 380px) {
+  .hero-title {
+    font-size: 1.6rem;
+  }
+  .brand-logo-title {
+    font-size: 1.3rem;
+  }
+  .masonry-grid {
+    column-count: 1;
+  }
+  .circle-cat-img-wrap {
+    width: 64px;
+    height: 64px;
+  }
+}
