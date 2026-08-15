@@ -459,8 +459,54 @@ function updateWhatsAppLinks(phone = '917010280939', msg = '') {
   const url = `https://wa.me/${phone}?text=${encodedMsg}`;
 
   document.querySelectorAll('a[href*="wa.me"]').forEach(a => {
-    a.href = url;
+    // Only update non-form links
+    if (!a.closest('#contact-form')) {
+      a.href = url;
+    }
   });
+}
+
+/**
+ * Dynamic WhatsApp Booking Inquiry Handler
+ * Formats client inputs into a clean, structured WhatsApp message
+ */
+async function handleBookingInquirySubmit(event) {
+  event.preventDefault();
+
+  const name = document.getElementById('booking-name')?.value.trim() || 'Valued Client';
+  const clientPhone = document.getElementById('booking-phone')?.value.trim() || 'Not specified';
+  const service = document.getElementById('booking-service')?.value || 'Bridal Makeover Services';
+  const date = document.getElementById('booking-date')?.value || '';
+  const notes = document.getElementById('booking-notes')?.value.trim() || '';
+
+  // Retrieve target WhatsApp phone number from CMS (or fallback to default)
+  let targetPhone = '917010280939';
+  if (typeof VMDB !== 'undefined') {
+    try {
+      const waData = await VMDB.dbGetSetting('whatsapp_config');
+      if (waData && waData.phone) {
+        targetPhone = waData.phone.replace(/[^0-9]/g, '');
+      }
+    } catch (e) {
+      console.warn('WA config fetch notice:', e);
+    }
+  }
+
+  // Build structured message payload
+  let message = `🌸 *NEW BOOKING ENQUIRY — VM_MAKEOVER* 🌸\n\n`;
+  message += `👤 *Client Name:* ${name}\n`;
+  message += `📞 *Phone Number:* ${clientPhone}\n`;
+  message += `💄 *Required Service:* ${service}\n`;
+  if (date) {
+    message += `📅 *Event Date:* ${date}\n`;
+  }
+  if (notes) {
+    message += `📝 *Notes:* ${notes}\n`;
+  }
+  message += `\nHello Vino! I would like to check availability and package pricing for this booking. Thank you! ✨`;
+
+  const waUrl = `https://wa.me/${targetPhone}?text=${encodeURIComponent(message)}`;
+  window.open(waUrl, '_blank');
 }
 
 /* ============================================================

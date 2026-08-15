@@ -379,25 +379,33 @@
 
       <div class="contact-form-wrap">
         <h3>Send Booking Inquiry</h3>
-        <form id="contact-form" onsubmit="event.preventDefault(); window.open('https://wa.me/917010280939?text=' + encodeURIComponent('Hello VM_MAKEOVER! I would like to inquire about booking an appointment.'), '_blank');">
+        <form id="contact-form" onsubmit="handleBookingInquirySubmit(event)">
           <div class="form-group">
             <label>Full Name</label>
-            <input type="text" placeholder="Enter your name" required />
+            <input type="text" id="booking-name" placeholder="Enter your full name" required />
           </div>
           <div class="form-group">
             <label>Phone Number</label>
-            <input type="tel" placeholder="+91 XXXXX XXXXX" required />
+            <input type="tel" id="booking-phone" placeholder="Enter contact phone number" required />
           </div>
           <div class="form-group">
             <label>Required Service</label>
-            <select>
-              <option>Bridal Makeover Package</option>
-              <option>Mukurtham Hairdo</option>
-              <option>Fresh Flower Garland</option>
-              <option>Saree Pre-Pleating</option>
-              <option>Mehandi / Henna Design</option>
-              <option>Blouse Aari Embroidery</option>
+            <select id="booking-service">
+              <option value="Bridal Makeover Package">Bridal Makeover Package</option>
+              <option value="Mukurtham Hairdo">Mukurtham Hairdo</option>
+              <option value="Fresh Flower Garlands">Fresh Flower Garlands</option>
+              <option value="Saree Pre-Pleating">Saree Pre-Pleating</option>
+              <option value="Mehandi & Henna Art">Mehandi & Henna Art</option>
+              <option value="Blouse (Aari) Embroidery">Blouse (Aari) Embroidery</option>
             </select>
+          </div>
+          <div class="form-group">
+            <label>Event Date (Optional)</label>
+            <input type="date" id="booking-date" class="form-control" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text);" />
+          </div>
+          <div class="form-group">
+            <label>Additional Notes / Preferences (Optional)</label>
+            <textarea id="booking-notes" rows="2" placeholder="Function location, timing, or specific requirements..." style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text);font-family:inherit;"></textarea>
           </div>
           <button type="submit" class="btn btn-primary" style="width:100%;">💬 Send Booking Inquiry via WhatsApp</button>
         </form>
