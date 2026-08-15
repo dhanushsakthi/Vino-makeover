@@ -676,6 +676,12 @@ function initDropZone() {
   const input = document.getElementById('file-input');
   if (!zone || !input) return;
 
+  zone.addEventListener('click', (e) => {
+    if (e.target.tagName !== 'BUTTON') {
+      input.click();
+    }
+  });
+
   zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
   zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
   zone.addEventListener('drop', (e) => {
