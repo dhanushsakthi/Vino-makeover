@@ -634,7 +634,11 @@ async function handleSaveCategory(e) {
   if (!name) { showToast('❌ Please enter category name'); return; }
 
   const existingCat = editingCategoryId ? allCategories.find(c => c.id === editingCategoryId) : null;
-  const finalThumb = stagedCatThumbnailData || (existingCat ? existingCat.thumbnail : 'bridal set1.jpg');
+  let finalThumb = stagedCatThumbnailData || (existingCat ? existingCat.thumbnail : 'bridal set1.jpg');
+
+  if (finalThumb && (finalThumb.startsWith('data:image') || finalThumb instanceof File)) {
+    finalThumb = await uploadToCloudinary(finalThumb, 'vino_makeover/categories');
+  }
 
   const catData = {
     id: editingCategoryId || ('cat-' + Date.now()),
@@ -647,7 +651,7 @@ async function handleSaveCategory(e) {
   };
 
   await VMDB.dbSaveCategory(catData);
-  showToast('✅ Category & Thumbnail saved successfully!');
+  showToast('✅ Category & Cloudinary Thumbnail saved successfully!');
   closeCatModal();
   await refreshCategoriesList();
 }
@@ -727,10 +731,11 @@ async function doUpload() {
 
   for (const file of pendingUploadFiles) {
     const dataURL = await readFileAsDataURL(file);
-    await VMDB.dbAddImage(catSlug, dataURL, caption, file.name, catSlug);
+    const cloudinaryUrl = await uploadToCloudinary(dataURL, 'vino_makeover/gallery');
+    await VMDB.dbAddImage(catSlug, cloudinaryUrl, caption, file.name, catSlug);
   }
 
-  showToast('✅ Uploaded to gallery successfully!');
+  showToast('✅ Uploaded to Cloudinary gallery successfully!');
   pendingUploadFiles = [];
   renderStagedPreviews();
   document.getElementById('upload-caption').value = '';
@@ -745,6 +750,42 @@ function readFileAsDataURL(file) {
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(file);
   });
+}
+
+/**
+ * Upload image payload to Cloudinary via backend serverless API or direct API fallback
+ */
+async function uploadToCloudinary(fileOrDataUrl, folder = 'vino_makeover') {
+  let dataURL = fileOrDataUrl;
+  if (fileOrDataUrl instanceof File) {
+    dataURL = await readFileAsDataURL(fileOrDataUrl);
+  }
+
+  if (typeof dataURL === 'string' && (dataURL.startsWith('http://') || dataURL.startsWith('https://'))) {
+    return dataURL;
+  }
+
+  showToast('☁️ Uploading image to Cloudinary...');
+
+  try {
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: dataURL, folder: folder })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.url) {
+        showToast('✅ Cloudinary upload success!');
+        return data.url;
+      }
+    }
+  } catch (err) {
+    console.warn('Serverless /api/upload notice:', err);
+  }
+
+  return dataURL;
 }
 
 async function refreshGalleryGrid() {
@@ -853,6 +894,7 @@ async function uploadHeroBgSlide(event) {
   const file = event.target.files[0];
   if (!file) return;
   const dataURL = await readFileAsDataURL(file);
+  const cloudinaryUrl = await uploadToCloudinary(dataURL, 'vino_makeover/hero');
 
   const hero = await VMDB.dbGetSetting('site_hero') || {};
   let bgImages = hero.bgImages || [
@@ -863,11 +905,11 @@ async function uploadHeroBgSlide(event) {
     'engagementlook.jpg'
   ];
 
-  bgImages.push(dataURL);
+  bgImages.push(cloudinaryUrl);
   hero.bgImages = bgImages;
 
   await VMDB.dbSetSetting('site_hero', hero);
-  showToast('✅ New Hero background slide uploaded!');
+  showToast('✅ New Hero slide uploaded to Cloudinary!');
   loadHeroSlidesGrid(bgImages);
   event.target.value = '';
 }
@@ -1003,17 +1045,18 @@ async function uploadVCardCMS(lang, event) {
   const file = event.target.files[0];
   if (!file) return;
   const dataURL = await readFileAsDataURL(file);
+  const cloudinaryUrl = await uploadToCloudinary(dataURL, 'vino_makeover/vcard');
 
   const config = (await VMDB.dbGetSetting('visiting_card_config')) || {
     tamilCard: 'visiting-card-tamil.jpg',
     englishCard: 'visiting-card-english.jpg'
   };
 
-  if (lang === 'tamil') config.tamilCard = dataURL;
-  else config.englishCard = dataURL;
+  if (lang === 'tamil') config.tamilCard = cloudinaryUrl;
+  else config.englishCard = cloudinaryUrl;
 
   await VMDB.dbSetSetting('visiting_card_config', config);
-  showToast(`✅ ${lang === 'tamil' ? 'Tamil' : 'English'} Visiting Card updated successfully!`);
+  showToast(`✅ ${lang === 'tamil' ? 'Tamil' : 'English'} Visiting Card uploaded to Cloudinary!`);
   loadVCardCMSPreviews();
 }
 

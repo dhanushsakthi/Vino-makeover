@@ -1,0 +1,12 @@
+{
+  "name": "vino-makeover",
+  "version": "1.0.0",
+  "description": "VM Beauty Care & Makeover Website with Cloudinary & IndexedDB",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "dependencies": {
+    "cloudinary": "^2.0.1"
+  }
+}
