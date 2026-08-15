@@ -580,13 +580,19 @@ async function renderGalleryGrid() {
   grid.innerHTML = '';
   allGalleryImages = [];
 
+  const deletedStatics = (await VMDB.dbGetSetting('deleted_static_images')) || [];
+  const editedStatics = (await VMDB.dbGetSetting('edited_static_images')) || {};
+
   // 1. Gather static images
   Object.keys(STATIC_CATEGORY_IMAGES).forEach(slug => {
     STATIC_CATEGORY_IMAGES[slug].forEach(img => {
+      if (deletedStatics.includes(img.src)) return;
+
+      const custom = editedStatics[img.src] || {};
       allGalleryImages.push({
-        src: img.src,
-        caption: img.caption,
-        slug: slug
+        src: custom.src || img.src,
+        caption: custom.caption || img.caption,
+        slug: custom.slug || slug
       });
     });
   });

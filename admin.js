@@ -788,37 +788,251 @@ async function uploadToCloudinary(fileOrDataUrl, folder = 'vino_makeover') {
   return dataURL;
 }
 
+/* Static fallback images map for admin management */
+const ADMIN_STATIC_IMAGES = {
+  'bridal-look': [
+    { src: 'Bridal look.jpg', caption: 'Bridal Look' },
+    { src: '01_bridal_makeover_background.png', caption: 'Bridal Makeover Artwork' },
+    { src: 'bridal set1.jpg', caption: 'Bridal Set 1' },
+    { src: 'bridal set2.jpg', caption: 'Bridal Set 2' },
+    { src: 'bridal set3.jpg', caption: 'Bridal Set 3' },
+    { src: 'engagementlook.jpg', caption: 'Engagement Look' }
+  ],
+  'bridal-set': [
+    { src: 'bridal set1.jpg', caption: 'Bridal Set 1' },
+    { src: 'bridal set2.jpg', caption: 'Bridal Set 2' },
+    { src: 'bridal set3.jpg', caption: 'Bridal Set 3' },
+    { src: 'bridal set4.jpg', caption: 'Bridal Set 4' },
+    { src: 'bridal set5.jpg', caption: 'Bridal Set 5' },
+    { src: 'bridal set6.jpg', caption: 'Bridal Set 6' },
+    { src: 'bridal set7.jpg', caption: 'Bridal Set 7' },
+    { src: '01_bridal_jewellery_background.png', caption: 'Bridal Jewellery & Makeup' }
+  ],
+  'engagement-look': [
+    { src: 'engagementlook.jpg', caption: 'Engagement Look' }
+  ],
+  'flower-garland': [
+    { src: 'Flowers Garland1.jpg', caption: 'Bridal Garland' },
+    { src: 'Flowers Garland2.jpg', caption: 'Wedding Garland' },
+    { src: 'Flowers Garland3.jpg', caption: 'Floral Design' },
+    { src: 'Flowers Garland4.jpg', caption: 'Jasmine Garland' },
+    { src: 'Flowers Garland5.jpg', caption: 'Ceremony Garland' },
+    { src: 'Flowers Garland6.jpg', caption: 'Floral Crown' },
+    { src: 'Flowers Garland7.jpg', caption: 'Rose Garland' },
+    { src: '03_fresh_flower_garlands_background.png', caption: 'Handcrafted Garland Collection' }
+  ],
+  'haldi-set': [
+    { src: 'Heldi set.jpg', caption: 'Bridal Mehandi & Haldi' },
+    { src: '05_mehandi_henna_background.png', caption: 'Vibrant Haldi Styling' }
+  ],
+  'messy-hairstyle': [
+    { src: 'messy hairstyle.jpg', caption: 'Messy Hairstyle' },
+    { src: '04_bridal_hair_background.png', caption: 'Chic Messy Hair Styling' }
+  ],
+  'mukurtham-hairdo': [
+    { src: 'Mukurtham Harido1.jpg', caption: 'Mukurtham Hairdo 1' },
+    { src: '02_mukurtham_hairdo_background.png', caption: 'Traditional Mukurtham Hair' },
+    { src: 'Mukurtham Harido2.jpg', caption: 'Mukurtham Hairdo 2' },
+    { src: 'Mukurtham Harido3.jpg', caption: 'Mukurtham Hairdo 3' },
+    { src: 'Mukurtham Harido4.jpg', caption: 'Mukurtham Hairdo 4' },
+    { src: 'Mukurtham Harido5.jpg', caption: 'Mukurtham Hairdo 5' },
+    { src: 'Mukurtham Harido6.jpg', caption: 'Mukurtham Hairdo 6' },
+    { src: 'Mukurtham Harido7.jpg', caption: 'Mukurtham Hairdo 7' },
+    { src: 'Mukurtham Harido8.jpg', caption: 'Mukurtham Hairdo 8' },
+    { src: 'Mukurtham Harido9.jpg', caption: 'Mukurtham Hairdo 9' },
+    { src: 'Mukurtham Harido10.jpg', caption: 'Royal Hairdo' }
+  ],
+  'puberty-look': [
+    { src: 'pubertylook.jpg', caption: 'Puberty Ceremony Look' }
+  ],
+  'blouse-aari': [
+    { src: 'Blouse-Thumbnail-image.png', caption: 'Custom Aari Embroidery Blouse' },
+    { src: '06_blouse_aari_background.png', caption: 'Hand Worked Aari Blouse Stitch' }
+  ],
+  'certificates': [
+    { src: 'certificate-thumb.jpg', caption: 'Government NSDC Certification' },
+    { src: 'certificate.webp', caption: 'Government NSDC Certified Beauty Artist' },
+    { src: 'certificate-background.png', caption: 'Certified Beauty & Bridal Professional' },
+    { src: 'certificate-collect image.jpg', caption: 'Official Certificate Honor' }
+  ]
+};
+
 async function refreshGalleryGrid() {
   if (typeof VMDB === 'undefined') return;
-  allGalleryImages = await VMDB.dbGetAll();
 
   const grid = document.getElementById('admin-manage-grid');
   if (!grid) return;
 
+  const deletedStatics = (await VMDB.dbGetSetting('deleted_static_images')) || [];
+  const editedStatics = (await VMDB.dbGetSetting('edited_static_images')) || {};
+
+  allGalleryImages = [];
+
+  // 1. Gather static images
+  Object.keys(ADMIN_STATIC_IMAGES).forEach(slug => {
+    ADMIN_STATIC_IMAGES[slug].forEach(img => {
+      if (deletedStatics.includes(img.src)) return;
+
+      const custom = editedStatics[img.src] || {};
+      allGalleryImages.push({
+        id: 'static:' + img.src,
+        src: custom.src || img.src,
+        originalSrc: img.src,
+        caption: custom.caption || img.caption,
+        categorySlug: custom.slug || slug,
+        isStatic: true
+      });
+    });
+  });
+
+  // 2. Gather uploaded DB images
+  try {
+    const dbImgs = await VMDB.dbGetAll();
+    dbImgs.forEach(img => {
+      allGalleryImages.push({
+        id: img.id,
+        src: img.dataURL,
+        caption: img.caption || 'Uploaded Gallery Image',
+        categorySlug: img.categorySlug || img.category,
+        isStatic: false
+      });
+    });
+  } catch (e) {
+    console.warn('DB images load info:', e);
+  }
+
   if (!allGalleryImages.length) {
-    grid.innerHTML = `<p style="color:var(--admin-text-muted);">No uploaded gallery images yet.</p>`;
+    grid.innerHTML = `<p style="color:var(--admin-text-muted);">No gallery images found.</p>`;
     return;
   }
 
-  grid.innerHTML = allGalleryImages.map(img => `
-    <div style="background:var(--admin-card);border:1px solid var(--admin-border);border-radius:var(--radius-md);overflow:hidden;">
-      <img src="${img.dataURL}" style="width:100%;height:160px;object-fit:cover;" />
-      <div style="padding:14px;">
-        <div style="font-size:0.88rem;font-weight:600;margin-bottom:4px;">${img.caption || 'Untitled Image'}</div>
-        <div style="font-size:0.75rem;color:var(--brand-gold);">${img.categorySlug || img.category}</div>
-        <button class="btn-action" style="background:rgba(230,57,70,0.15);color:var(--danger);width:100%;justify-content:center;margin-top:12px;" onclick="deleteGalleryImage(${img.id})">🗑 Delete</button>
+  grid.innerHTML = allGalleryImages.map((img, idx) => `
+    <div style="background:var(--admin-card);border:1px solid var(--admin-border);border-radius:var(--radius-md);overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;">
+      <div>
+        <img src="${img.src}" style="width:100%;height:160px;object-fit:cover;" />
+        <div style="padding:14px;">
+          <div style="font-size:0.88rem;font-weight:600;margin-bottom:4px;word-break:break-word;">${img.caption || 'Untitled Image'}</div>
+          <div style="font-size:0.75rem;color:var(--brand-gold);margin-bottom:8px;">${img.categorySlug} ${img.isStatic ? '<span style="opacity:0.6;">(Default)</span>' : ''}</div>
+        </div>
+      </div>
+      <div style="padding:0 14px 14px 14px;display:flex;gap:8px;">
+        <button class="btn-action" style="background:rgba(212,175,55,0.15);color:var(--brand-gold);flex:1;justify-content:center;" onclick="openEditImageModal(${idx})">✏️ Edit</button>
+        <button class="btn-action" style="background:rgba(230,57,70,0.15);color:var(--danger);flex:1;justify-content:center;" onclick="deleteGalleryImage('${img.id}')">🗑 Delete</button>
       </div>
     </div>
   `).join('');
 }
 
-async function deleteGalleryImage(id) {
-  if (confirm('Delete this gallery image permanently?')) {
-    await VMDB.dbDeleteImage(id);
-    showToast('🗑 Image deleted');
-    await refreshGalleryGrid();
-    await refreshDashboardStats();
+let stagedEditImageData = null;
+
+function openEditImageModal(idx) {
+  const img = allGalleryImages[idx];
+  if (!img) return;
+
+  stagedEditImageData = null;
+
+  document.getElementById('edit-img-id').value = img.id;
+  document.getElementById('edit-img-is-static').value = img.isStatic ? 'true' : 'false';
+  document.getElementById('edit-img-original-src').value = img.originalSrc || img.src;
+  document.getElementById('edit-img-preview').src = img.src;
+  document.getElementById('edit-img-caption').value = img.caption || '';
+  if (document.getElementById('edit-img-file-input')) document.getElementById('edit-img-file-input').value = '';
+
+  const catSelect = document.getElementById('edit-img-cat-select');
+  if (catSelect) {
+    catSelect.innerHTML = allCategories.map(c => `
+      <option value="${c.slug}" ${c.slug === img.categorySlug ? 'selected' : ''}>${c.name}</option>
+    `).join('');
   }
+
+  document.getElementById('edit-image-modal').style.display = 'flex';
+}
+
+function previewEditImgFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    stagedEditImageData = e.target.result;
+    document.getElementById('edit-img-preview').src = stagedEditImageData;
+  };
+  reader.readAsDataURL(file);
+}
+
+function closeEditImageModal() {
+  document.getElementById('edit-image-modal').style.display = 'none';
+}
+
+async function handleSaveEditedImage(e) {
+  e.preventDefault();
+
+  const id = document.getElementById('edit-img-id').value;
+  const isStatic = document.getElementById('edit-img-is-static').value === 'true';
+  const originalSrc = document.getElementById('edit-img-original-src').value;
+  const caption = document.getElementById('edit-img-caption').value.trim();
+  const categorySlug = document.getElementById('edit-img-cat-select').value;
+  const fileInput = document.getElementById('edit-img-file-input');
+
+  let finalUrl = document.getElementById('edit-img-preview').src;
+
+  // If a new replacement file was picked, upload to Cloudinary
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    finalUrl = await uploadToCloudinary(fileInput.files[0], 'vino_makeover/gallery');
+  } else if (stagedEditImageData && stagedEditImageData.startsWith('data:image')) {
+    finalUrl = await uploadToCloudinary(stagedEditImageData, 'vino_makeover/gallery');
+  }
+
+  if (isStatic) {
+    const editedStatics = (await VMDB.dbGetSetting('edited_static_images')) || {};
+    editedStatics[originalSrc] = {
+      src: finalUrl,
+      caption: caption,
+      slug: categorySlug
+    };
+    await VMDB.dbSetSetting('edited_static_images', editedStatics);
+  } else {
+    // DB uploaded image update
+    const dbId = parseInt(id) || id;
+    const all = await VMDB.dbGetAll();
+    const existing = all.find(i => i.id == dbId);
+    if (existing) {
+      existing.dataURL = finalUrl;
+      existing.caption = caption;
+      existing.category = categorySlug;
+      existing.categorySlug = categorySlug;
+
+      // Update in IndexedDB
+      const db = await VMDB.openDB();
+      const tx = db.transaction('images', 'readwrite');
+      const store = tx.objectStore('images');
+      store.put(existing);
+    }
+  }
+
+  showToast('✅ Image updated successfully!');
+  closeEditImageModal();
+  await refreshGalleryGrid();
+  await refreshDashboardStats();
+}
+
+async function deleteGalleryImage(id) {
+  if (!confirm('Delete this gallery image permanently from website?')) return;
+
+  if (typeof id === 'string' && id.startsWith('static:')) {
+    const staticSrc = id.replace('static:', '');
+    const deletedStatics = (await VMDB.dbGetSetting('deleted_static_images')) || [];
+    if (!deletedStatics.includes(staticSrc)) {
+      deletedStatics.push(staticSrc);
+      await VMDB.dbSetSetting('deleted_static_images', deletedStatics);
+    }
+  } else {
+    const numericId = parseInt(id) || id;
+    await VMDB.dbDeleteImage(numericId);
+  }
+
+  showToast('🗑 Image deleted permanently!');
+  await refreshGalleryGrid();
+  await refreshDashboardStats();
 }
 
 /* ============================================================

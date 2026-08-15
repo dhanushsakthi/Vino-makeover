@@ -634,6 +634,40 @@
         </div>
       </form>
     </div>
+  <!-- EDIT GALLERY IMAGE MODAL -->
+  <div id="edit-image-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;padding:24px;">
+    <div style="background:var(--admin-card);border:1px solid var(--admin-border);border-radius:var(--radius-lg);padding:32px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;">
+      <h3 id="edit-img-modal-title" style="font-family:var(--font-serif);font-size:1.6rem;margin-bottom:20px;color:var(--brand-gold);">Edit Gallery Image</h3>
+      <form onsubmit="handleSaveEditedImage(event)">
+        <input type="hidden" id="edit-img-id" />
+        <input type="hidden" id="edit-img-is-static" value="false" />
+        <input type="hidden" id="edit-img-original-src" value="" />
+        
+        <div class="form-group" style="text-align:center;">
+          <img id="edit-img-preview" src="" style="max-width:100%;max-height:180px;object-fit:cover;border-radius:8px;border:1px solid var(--brand-gold);" />
+        </div>
+
+        <div class="form-group">
+          <label>Replace Image File (Optional - Uploads to Cloudinary)</label>
+          <input class="form-control" type="file" id="edit-img-file-input" accept="image/*" onchange="previewEditImgFile(event)" />
+        </div>
+
+        <div class="form-group">
+          <label>Image Caption / Title</label>
+          <input class="form-control" type="text" id="edit-img-caption" placeholder="e.g. Traditional Mukurtham Hairdo" required />
+        </div>
+
+        <div class="form-group">
+          <label>Category</label>
+          <select class="form-control" id="edit-img-cat-select" required></select>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:24px;">
+          <button type="submit" class="btn-upload" style="flex:1;justify-content:center;">Save Changes</button>
+          <button type="button" class="btn-action" style="background:rgba(255,255,255,0.1);color:#fff;" onclick="closeEditImageModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <div class="admin-toast-container" id="admin-toast-container"></div>
